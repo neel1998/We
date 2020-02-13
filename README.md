@@ -40,3 +40,9 @@ All you need to do is install this app, export your favourite chat from WhatsApp
 ### Screenshots
 
 <img src = 'Screeshots/We_1.jpg' width = '200' /> <img src = 'Screeshots/We_2.jpg' width = '200' /> <img src = 'Screeshots/We_3.jpg' width = '200' />
+
+
+### Upcoming features
+
+ - Show media along with text messages
+ - Support to export group chats
