@@ -1,8 +1,10 @@
 package com.abc.we;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,11 +24,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         chatObject = new JSONObject();
+
+        getPermissions();
 
         mainProgressBar = findViewById(R.id.main_progressbar);
         Calendar cal = Calendar.getInstance();
@@ -100,7 +108,25 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else {
+        } else if (getIntent().getStringExtra("data_string") != null) {
+            Uri uri = Uri.parse(getIntent().getStringExtra("data_string"));
+            try {
+                InputStream is = getContentResolver().openInputStream(uri);
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                String data = new String(buffer);
+                String[] dataList = data.split("\n");
+                new getDataTask().execute(dataList);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        else {
             startActivity(new Intent(MainActivity.this, SelectChatActivity.class));
         }
 
@@ -322,6 +348,12 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void getPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100 );
         }
     }
 }
